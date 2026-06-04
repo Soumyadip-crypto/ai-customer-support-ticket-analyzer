@@ -1,0 +1,21 @@
+<nav class="navbar">
+  <h2>AI Support Desk</h2>
+
+  <div class="nav-links">
+    @if (authService.isLoggedIn()) {
+      <a routerLink="/dashboard">Dashboard</a>
+      <a routerLink="/tickets">My Tickets</a>
+      <a routerLink="/tickets/create">Create Ticket</a>
+      <a routerLink="/chatbot">AI Chatbot</a>
+      @if(authService.getUser()?.role ==='admin'||authService.getUser()?.role==='support'){
+        <a routerLink="/admin/tickets">Admin Tickets</a>
+      }
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    } @else {
+      <a routerLink="/login">Login</a>
+      <a routerLink="/register">Register</a>
+    }
+  </div>
+</nav>
+
+<router-outlet></router-outlet>

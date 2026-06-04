@@ -1,0 +1,206 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2>Admin / Support Tickets</h2>
+      <p>Manage all customer support tickets.</p>
+    </div>
+
+    <button routerLink="/dashboard">Back</button>
+  </div>
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (successMessage) {
+    <p class="success">{{ successMessage }}</p>
+  }
+
+  @if (statsLoading) {
+    <p class="info">Loading stats...</p>
+  }
+
+  @if (stats) {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>{{ stats.totalTickets }}</h3>
+        <p>Total Tickets</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>{{ stats.openTickets }}</h3>
+        <p>Open</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>{{ stats.pendingTickets }}</h3>
+        <p>Pending</p>
+      </div>
+
+      <div class="stat-card">
+        <h3>{{ stats.resolvedTickets }}</h3>
+        <p>Resolved</p>
+      </div>
+
+      <div class="stat-card danger">
+        <h3>{{ stats.highPriorityTickets }}</h3>
+        <p>High Priority</p>
+      </div>
+    </div>
+  }
+
+  <div class="filter-card">
+    <input
+      type="text"
+      [(ngModel)]="search"
+      placeholder="Search by subject, message, ticket ID..."
+    />
+
+    <select [(ngModel)]="statusFilter">
+      <option value="">All Status</option>
+      <option value="Open">Open</option>
+      <option value="Pending">Pending</option>
+      <option value="Resolved">Resolved</option>
+      <option value="Closed">Closed</option>
+    </select>
+
+    <select [(ngModel)]="priorityFilter">
+      <option value="">All Priority</option>
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+      <option value="Urgent">Urgent</option>
+    </select>
+
+    <select [(ngModel)]="categoryFilter">
+      <option value="">All Category</option>
+      <option value="General">General</option>
+      <option value="Hosting Issue">Hosting Issue</option>
+      <option value="DNS Issue">DNS Issue</option>
+      <option value="SSL Issue">SSL Issue</option>
+      <option value="Billing Issue">Billing Issue</option>
+    </select>
+
+    <button (click)="applyFilters()">Apply</button>
+    <button class="clear-btn" (click)="clearFilters()">Clear</button>
+  </div>
+  @if (!loading && totalTickets > 0) {
+  <p class="result-count">
+    Showing {{ tickets.length }} of {{ totalTickets }} tickets
+  </p>
+}
+
+  @if (loading) {
+    <p class="info">Loading tickets...</p>
+  }
+
+  @if (!loading && tickets.length === 0) {
+    <div class="empty-card">
+      <h3>No tickets found</h3>
+      <p>No tickets match your filter.</p>
+    </div>
+  }
+
+  <div class="tickets-list">
+    @for (ticket of tickets; track ticket._id) {
+      <div class="ticket-card">
+        <div class="ticket-header">
+          <div>
+            <h3>{{ ticket.subject }}</h3>
+            <p class="ticket-id">{{ ticket.ticketId }}</p>
+          </div>
+
+          <span
+            class="status"
+            [class.open]="ticket.status === 'Open'"
+            [class.pending]="ticket.status === 'Pending'"
+            [class.resolved]="ticket.status === 'Resolved'"
+            [class.closed]="ticket.status === 'Closed'"
+          >
+            {{ ticket.status }}
+          </span>
+        </div>
+
+        <p class="message">{{ ticket.message }}</p>
+
+        <div class="info-grid">
+          <div>
+            <strong>Category</strong>
+            <p>{{ ticket.category }}</p>
+          </div>
+
+          <div>
+            <strong>Priority</strong>
+            <p>{{ ticket.priority }}</p>
+          </div>
+
+          <div>
+            <strong>Sentiment</strong>
+            <p>{{ ticket.sentiment }}</p>
+          </div>
+
+          <div>
+            <strong>User</strong>
+            <p>{{ getUserName(ticket.user) }}</p>
+            <small>{{ getUserEmail(ticket.user) }}</small>
+          </div>
+
+          <div>
+            <strong>Assigned To</strong>
+            <p>{{ getUserName(ticket.assignedTo) }}</p>
+            <small>{{ getUserEmail(ticket.assignedTo) }}</small>
+          </div>
+        </div>
+
+        <div class="ai-box">
+          <strong>AI Summary</strong>
+          <p>{{ ticket.aiSummary }}</p>
+        </div>
+
+        <div class="actions">
+          <select
+            [ngModel]="ticket.status"
+            (ngModelChange)="updateStatus(ticket, $event)"
+          >
+            <option value="Open">Open</option>
+            <option value="Pending">Pending</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Closed">Closed</option>
+          </select>
+
+          <input
+            type="text"
+            [(ngModel)]="assignUserId"
+            placeholder="Support/Admin user id"
+          />
+
+          <button (click)="assignTicket(ticket)">Assign</button>
+
+          <a [routerLink]="['/tickets', ticket._id]">
+            View Details
+          </a>
+
+          @if (isAdmin()) {
+            <button class="delete-btn" (click)="deleteTicket(ticket)">
+              Delete
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (!loading && totalTickets > 0) {
+    <div class="pagination">
+      <button (click)="prevPage()" [disabled]="page === 1">
+        Previous
+      </button>
+
+      <span>Page {{ page }} of {{ totalPages }}</span>
+
+      <button (click)="nextPage()" [disabled]="page === totalPages">
+        Next
+      </button>
+    </div>
+  }
+</div>

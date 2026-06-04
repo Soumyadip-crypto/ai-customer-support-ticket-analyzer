@@ -1,0 +1,31 @@
+<div class="dashboard-container">
+  <div class="welcome-card">
+    <h1>Welcome, {{ user?.name }}</h1>
+    <p>Email: {{ user?.email }}</p>
+    <p>Role: <span class="role">{{ user?.role }}</span></p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card clickable" routerLink="/tickets">
+      <h3>My Tickets</h3>
+      <p>Create and view your support tickets.</p>
+    </div>
+
+    <div class="stat-card clickable" routerLink="/chatbot">
+      <h3>AI Chatbot</h3>
+      <p>Ask AI for quick support help.</p>
+    </div>
+
+    <div class="stat-card clickable" routerLink="/tickets/create">
+      <h3>Create Ticket</h3>
+      <p>Raise a new support ticket.</p>
+    </div>
+
+    @if (user?.role === 'admin' || user?.role === 'support') {
+      <div class="stat-card admin-card clickable" routerLink="/admin/tickets">
+        <h3>All Tickets</h3>
+        <p>Manage customer tickets.</p>
+      </div>
+    }
+  </div>
+</div>

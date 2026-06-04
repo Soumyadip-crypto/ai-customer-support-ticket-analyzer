@@ -1,0 +1,125 @@
+<div class="page-container">
+  <button class="back-btn" routerLink="/tickets">Back to Tickets</button>
+
+  @if (loading) {
+    <p class="info">Loading ticket...</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (ticket) {
+    <div class="details-card">
+      <div class="ticket-header">
+        <div>
+          <h2>{{ ticket.subject }}</h2>
+          <p class="ticket-id">{{ ticket.ticketId }}</p>
+        </div>
+
+        <span class="status" [class]="ticket.status.toLowerCase()">
+          {{ ticket.status }}
+        </span>
+      </div>
+
+      <div class="section">
+        <h3>Ticket Message</h3>
+        <p>{{ ticket.message }}</p>
+      </div>
+
+      <div class="info-grid">
+        <div>
+          <strong>Category</strong>
+          <p>{{ ticket.category }}</p>
+        </div>
+
+        <div>
+          <strong>Priority</strong>
+          <p>{{ ticket.priority }}</p>
+        </div>
+
+        <div>
+          <strong>Sentiment</strong>
+          <p>{{ ticket.sentiment }}</p>
+        </div>
+
+        <div>
+          <strong>Status</strong>
+          <p>{{ ticket.status }}</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Created By</h3>
+        <p>{{ getUserName(ticket.user) }}</p>
+        <p>{{ getUserEmail(ticket.user) }}</p>
+      </div>
+
+      <div class="ai-section">
+        <h3>AI Analysis</h3>
+
+        <div class="ai-box">
+          <strong>Summary</strong>
+          <p>{{ ticket.aiSummary }}</p>
+        </div>
+
+        <div class="ai-box">
+          <strong>Suggested Reply</strong>
+          <p>{{ ticket.aiSuggestedReply }}</p>
+        </div>
+
+        <div class="ai-box">
+          <strong>Solution Steps</strong>
+
+          @for (step of ticket.aiSolutionSteps; track step) {
+            <p>• {{ step }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="reply-card">
+      <h3>Replies</h3>
+
+      @if (replies.length === 0) {
+        <p class="muted">No replies yet.</p>
+      }
+
+      @for (reply of replies; track reply._id) {
+        <div class="reply-item">
+          <div class="reply-top">
+            <strong>{{ getUserName(reply.sender) }}</strong>
+            <span>{{ getUserRole(reply.sender) }}</span>
+          </div>
+
+          <p>{{ reply.message }}</p>
+        </div>
+      }
+
+      <form #replyForm="ngForm" (ngSubmit)="addReply()">
+        <div class="form-group">
+          <label>Add Reply</label>
+          <textarea
+            name="replyMessage"
+            [(ngModel)]="replyMessage"
+            required
+            rows="4"
+            placeholder="Write your reply..."
+          ></textarea>
+        </div>
+
+        @if (replyError) {
+          <p class="error">{{ replyError }}</p>
+        }
+
+        @if (replySuccess) {
+          <p class="success">{{ replySuccess }}</p>
+        }
+
+        <button type="submit" [disabled]="replyForm.invalid || replyLoading">
+          {{ replyLoading ? 'Sending...' : 'Send Reply' }}
+        </button>
+      </form>
+    </div>
+  }
+</div>

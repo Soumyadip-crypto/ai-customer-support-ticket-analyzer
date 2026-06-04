@@ -1,0 +1,81 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2>My Tickets</h2>
+      <p>View your support tickets and AI analysis.</p>
+    </div>
+
+    <button routerLink="/tickets/create">Create Ticket</button>
+  </div>
+
+  @if (loading) {
+    <p class="info">Loading tickets...</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (!loading && tickets.length === 0) {
+    <div class="empty-card">
+      <h3>No tickets found</h3>
+      <p>Create your first support ticket.</p>
+      <button routerLink="/tickets/create">Create Ticket</button>
+    </div>
+  }
+  
+@if (!loading && totalTickets > 0) {
+  <p class="result-count">
+    Showing {{ tickets.length }} of {{ totalTickets }} tickets
+  </p>
+}
+  <div class="ticket-grid">
+    @for (ticket of tickets; track ticket._id) {
+      <div class="ticket-card">
+        <div class="ticket-top">
+          <h3>{{ ticket.subject }}</h3>
+
+          <span
+            class="status"
+            [class.open]="ticket.status === 'Open'"
+            [class.pending]="ticket.status === 'Pending'"
+            [class.resolved]="ticket.status === 'Resolved'"
+            [class.closed]="ticket.status === 'Closed'"
+          >
+            {{ ticket.status }}
+          </span>
+        </div>
+
+        <p class="ticket-id">{{ ticket.ticketId }}</p>
+
+        <p class="message">
+          {{ ticket.message }}
+        </p>
+
+        <div class="meta">
+          <span>Category: {{ ticket.category }}</span>
+          <span>Priority: {{ ticket.priority }}</span>
+          <span>Sentiment: {{ ticket.sentiment }}</span>
+        </div>
+
+        <a [routerLink]="['/tickets', ticket._id]">
+          View Details
+        </a>
+      </div>
+    }
+  </div>
+
+  @if (!loading && totalTickets > 0) {
+    <div class="pagination">
+      <button (click)="prevPage()" [disabled]="page === 1">
+        Previous
+      </button>
+
+      <span>Page {{ page }} of {{ totalPages }}</span>
+
+      <button (click)="nextPage()" [disabled]="page === totalPages">
+        Next
+      </button>
+    </div>
+  }
+</div>

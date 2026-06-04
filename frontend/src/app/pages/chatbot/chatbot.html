@@ -1,0 +1,94 @@
+<div class="page-container">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div>
+        <h2>AI Support Chatbot</h2>
+        <p>Ask your hosting, DNS, SSL, billing or website issue.</p>
+      </div>
+
+      <button class="secondary-btn" routerLink="/dashboard">Back</button>
+    </div>
+
+    @if (historyLoading) {
+      <p class="info">Loading chat history...</p>
+    }
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    }
+
+    @if (successMessage) {
+      <p class="success">{{ successMessage }}</p>
+    }
+
+    <div class="chat-box" #chatBox>
+      @if (messages.length === 0 && !historyLoading) {
+        <div class="empty-chat">
+          <h3>No chat yet</h3>
+          <p>Start by asking your issue.</p>
+        </div>
+      }
+
+      @for (msg of messages; track msg._id) {
+        <div
+          class="message-row"
+          [class.user-row]="msg.sender === 'user'"
+          [class.ai-row]="msg.sender === 'ai'"
+        >
+          <div
+            class="message-bubble"
+            [class.user-bubble]="msg.sender === 'user'"
+            [class.ai-bubble]="msg.sender === 'ai'"
+          >
+            <strong>{{ msg.sender === 'user' ? 'You' : 'AI Assistant' }}</strong>
+            <p>{{ msg.message }}</p>
+
+            @if (msg.createdTicket) {
+              <small>Ticket linked</small>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (shouldCreateTicket) {
+      <div class="ticket-suggestion">
+        <div>
+          <strong>AI Suggestion</strong>
+          <p>This looks like a {{ suggestedCategory }}. You can create a ticket.</p>
+        </div>
+
+        <button (click)="createTicketFromChat()" [disabled]="ticketCreating">
+          {{ ticketCreating ? 'Creating...' : 'Create Ticket' }}
+        </button>
+      </div>
+    }
+
+    @if (createdTicket) {
+      <div class="created-ticket">
+        <h3>Ticket Created</h3>
+        <p><strong>Ticket ID:</strong> {{ createdTicket.ticketId }}</p>
+        <p><strong>Category:</strong> {{ createdTicket.category }}</p>
+        <p><strong>Priority:</strong> {{ createdTicket.priority }}</p>
+
+        <a [routerLink]="['/tickets', createdTicket._id]">
+          View Ticket Details
+        </a>
+      </div>
+    }
+
+    <form class="chat-form" #chatForm="ngForm" (ngSubmit)="sendMessage()">
+      <input
+        type="text"
+        name="userMessage"
+        [(ngModel)]="userMessage"
+        required
+        placeholder="Example: My website is showing 503 error"
+      />
+
+      <button type="submit" [disabled]="chatForm.invalid || loading">
+        {{ loading ? 'Sending...' : 'Send' }}
+      </button>
+    </form>
+  </div>
+</div>

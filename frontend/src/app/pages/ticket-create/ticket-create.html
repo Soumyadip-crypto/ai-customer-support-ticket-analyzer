@@ -1,0 +1,87 @@
+<div class="page-container">
+  <div class="ticket-card">
+    <div class="card-header">
+      <div>
+        <h2>Create Support Ticket</h2>
+        <p>Explain your issue and our AI will analyze it automatically.</p>
+      </div>
+
+      <button class="secondary-btn" routerLink="/dashboard">Back</button>
+    </div>
+
+    <form #ticketForm="ngForm" (ngSubmit)="createTicket()">
+      <div class="form-group">
+        <label>Subject</label>
+        <input
+          type="text"
+          name="subject"
+          [(ngModel)]="subject"
+          required
+          placeholder="Example: Website is showing 503 error"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Message</label>
+        <textarea
+          name="message"
+          [(ngModel)]="message"
+          required
+          rows="6"
+          placeholder="Describe your issue..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Priority</label>
+        <select name="priority" [(ngModel)]="priority">
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+
+      @if (errorMessage) {
+        <p class="error">{{ errorMessage }}</p>
+      }
+
+      @if (successMessage) {
+        <p class="success">{{ successMessage }}</p>
+      }
+
+      <button type="submit" [disabled]="ticketForm.invalid || loading">
+        {{ loading ? 'Creating...' : 'Create Ticket' }}
+      </button>
+    </form>
+
+    @if (createdTicket) {
+      <div class="result-card">
+        <h3>Ticket Created</h3>
+
+        <p><strong>Ticket ID:</strong> {{ createdTicket.ticketId }}</p>
+        <p><strong>Category:</strong> {{ createdTicket.category }}</p>
+        <p><strong>Priority:</strong> {{ createdTicket.priority }}</p>
+        <p><strong>Sentiment:</strong> {{ createdTicket.sentiment }}</p>
+
+        <div class="ai-box">
+          <h4>AI Summary</h4>
+          <p>{{ createdTicket.aiSummary }}</p>
+        </div>
+
+        <div class="ai-box">
+          <h4>AI Suggested Reply</h4>
+          <p>{{ createdTicket.aiSuggestedReply }}</p>
+        </div>
+
+        <div class="ai-box">
+          <h4>AI Solution Steps</h4>
+
+          @for (step of createdTicket.aiSolutionSteps || []; track step) {
+            <p>• {{ step }}</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
